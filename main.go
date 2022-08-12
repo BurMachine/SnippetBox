@@ -11,9 +11,19 @@ import (
 	*http.Request - это указател на структуру, которая содержит информацию о текущем запросе(GET, POST, DELETE, etc...)
 	w - writer куда это все пишется, r - хранит все реквесты(запросы)
 */
-func home(w http.ResponseWriter, r *http.Request) {
+func home(w http.ResponseWriter, r *http.Request) { // "/"
 	//body := r.GetBody
 	w.Write([]byte("Привет здарова"))
+}
+
+// Отображает определенную заметку
+func showSnippet(w http.ResponseWriter, r *http.Request) { // "/snippet"
+	w.Write([]byte("Оображение заетки..."))
+}
+
+// Создает новую заметку
+func createSnippet(w http.ResponseWriter, r *http.Request) { // "/snippet/create"
+	w.Write([]byte("Форма для создания новой заметки..."))
 }
 
 /*
@@ -24,7 +34,9 @@ func home(w http.ResponseWriter, r *http.Request) {
 */
 func main() {
 	mux := http.NewServeMux() // новый роутер
-	mux.HandleFunc("/", home) // решистрирует функцию home как обработчик для роутера mux
+	mux.HandleFunc("/", home) // регистрирует функцию home как обработчик для роутера mux ...
+	mux.HandleFunc("/snippet", showSnippet)
+	mux.HandleFunc("/snippet/create", createSnippet)
 
 	log.Println("Запуск веб-сервера на http://127.0.0.1:4000")
 	err := http.ListenAndServe(":4000", mux) // Запуск нового веб-сервера
