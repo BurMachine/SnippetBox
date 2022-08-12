@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
+	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 /*
@@ -16,12 +19,28 @@ func home(w http.ResponseWriter, r *http.Request) { // "/"
 		http.NotFound(w, r)
 		return
 	}
-	w.Write([]byte("Привет здарова"))
+	pageTemp, err := template.ParseFiles("../../ui/html/home.page.tmpl")
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error1", 500)
+		return
+	}
+	err = pageTemp.Execute(w, nil)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error2", 500)
+	}
+	//w.Write([]byte("Привет здарова"))
 }
 
 // Отображает определенную заметку
 func showSnippet(w http.ResponseWriter, r *http.Request) { // "/snippet"
-	w.Write([]byte("Оображение заетки..."))
+	id, err := strconv.Atoi(r.URL.Query().Get("id")) // Считывание значения id. Затем проверка
+	if err != nil || id < 0 {
+		http.NotFound(w, r)
+		return
+	}
+	fmt.Fprintf(w, "Отображение заметки с ID %d...", id)
 }
 
 // Создает новую заметку
@@ -32,21 +51,4 @@ func createSnippet(w http.ResponseWriter, r *http.Request) { // "/snippet/create
 		return
 	}
 	w.Write([]byte("Форма для создания новой заметки..."))
-}
-
-/*
-	http.NewServeMux - инициализация нового роутера
-	mux.HandleFunc("/", home) регистрация home как обработчика url шаблона "/"
-	http.ListenAndServe  - получает в качестве параметров TCP-адрес сети для прослушивания (localhost:4000)
-	и созданный роутер
-*/
-func main() {
-	mux := http.NewServeMux() // новый роутер
-	mux.HandleFunc("/", home) // регистрирует функцию home как обработчик для роутера mux ...
-	mux.HandleFunc("/snippet", showSnippet)
-	mux.HandleFunc("/snippet/create", createSnippet)
-
-	log.Println("Запуск веб-сервера на http://127.0.0.1:4000")
-	err := http.ListenAndServe(":4000", mux) // Запуск нового веб-сервера
-	log.Fatal(err)
 }
