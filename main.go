@@ -12,7 +12,10 @@ import (
 	w - writer куда это все пишется, r - хранит все реквесты(запросы)
 */
 func home(w http.ResponseWriter, r *http.Request) { // "/"
-	//body := r.GetBody
+	if r.URL.Path != "/" { // Обработка неправильного URL
+		http.NotFound(w, r)
+		return
+	}
 	w.Write([]byte("Привет здарова"))
 }
 
@@ -23,6 +26,11 @@ func showSnippet(w http.ResponseWriter, r *http.Request) { // "/snippet"
 
 // Создает новую заметку
 func createSnippet(w http.ResponseWriter, r *http.Request) { // "/snippet/create"
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allowed-method", http.MethodPost) // добавляет ключ:значение в карту HTTP
+		http.Error(w, "Метод запрещен!", 405)             // отправляет в ResponceWriter строку и в карту HTTP еод ошибки (перед write обязательно)
+		return
+	}
 	w.Write([]byte("Форма для создания новой заметки..."))
 }
 
