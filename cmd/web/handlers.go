@@ -19,18 +19,22 @@ func home(w http.ResponseWriter, r *http.Request) { // "/"
 		http.NotFound(w, r)
 		return
 	}
-	pageTemp, err := template.ParseFiles("../../ui/html/home.page.tmpl")
+	files := []string{
+		"../../ui/html/home.page.tmpl",
+		"../../ui/html/base.layout.tmpl",
+		"../../ui/html/footer.partial.tmpl",
+	}
+	pageTemp, err := template.ParseFiles(files...) // любой путь. Тут читается файл шаблона
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Internal Server Error1", 500)
 		return
 	}
-	err = pageTemp.Execute(w, nil)
+	err = pageTemp.Execute(w, nil) // Записываем содержимое шаблона в тело HTTP ответа, nil для отправки динамических данных в шаблон
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Internal Server Error2", 500)
 	}
-	//w.Write([]byte("Привет здарова"))
 }
 
 // Отображает определенную заметку
