@@ -8,6 +8,11 @@ import (
 	"path/filepath"
 )
 
+type application struct {
+	errorlog *log.Logger
+	infolog  *log.Logger
+}
+
 /*
 	http.NewServeMux - инициализация нового роутера
 	mux.HandleFunc("/", home) регистрация home как обработчика url шаблона "/"
@@ -19,10 +24,14 @@ func main() {
 	flag.Parse()                                                                  // извлечение флага из командной строки(меняет по адресу addr)
 	infolog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)                  // создание логгера INFO в stdout
 	errorlog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile) // логгер ошибок ERROR
-	mux := http.NewServeMux()                                                     // новый роутер
-	mux.HandleFunc("/", home)                                                     // регистрирует функцию home как обработчик для роутера mux ...
-	mux.HandleFunc("/snippet", showSnippet)
-	mux.HandleFunc("/snippet/create", createSnippet)
+	app := &application{                                                          // инициализация новой структуры, чтобы подтянуть методы
+		errorlog: errorlog,
+		infolog:  infolog,
+	}
+	mux := http.NewServeMux()     // новый роутер
+	mux.HandleFunc("/", app.home) // регистрирует функцию home как обработчик для роутера mux ...
+	mux.HandleFunc("/snippet", app.showSnippet)
+	mux.HandleFunc("/snippet/create", app.createSnippet)
 
 	// инициализация FileServer, который будет обрабатывать HTTP-запросы к статическим файлам из ./ui/static/
 	fileServer := http.FileServer(neuterdFileSystem{http.Dir("./static")})
