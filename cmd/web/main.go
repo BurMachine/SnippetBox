@@ -17,6 +17,11 @@ func main() {
 	mux.HandleFunc("/snippet", showSnippet)
 	mux.HandleFunc("/snippet/create", createSnippet)
 
+	// инициализация FileServer, который будет обрабатывать HTTP-запросы к статическим файлам из ./ui/static/
+	fileServer := http.FileServer(http.Dir("../../ui/static/"))
+	// регистрация всех запросов начинающихся со "/static"
+	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+
 	log.Println("Запуск веб-сервера на http://127.0.0.1:4000")
 	err := http.ListenAndServe(":4000", mux) // Запуск нового веб-сервера
 	log.Fatal(err)
