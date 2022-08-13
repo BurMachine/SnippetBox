@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-type application struct {
+type application1 struct {
 	errorlog *log.Logger
 	infolog  *log.Logger
 }
@@ -24,25 +24,15 @@ func main() {
 	flag.Parse()                                                                  // извлечение флага из командной строки(меняет по адресу addr)
 	infolog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)                  // создание логгера INFO в stdout
 	errorlog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile) // логгер ошибок ERROR
-	app := &application{                                                          // инициализация новой структуры, чтобы подтянуть методы
+	app := &application1{                                                         // инициализация новой структуры, чтобы подтянуть методы
 		errorlog: errorlog,
 		infolog:  infolog,
 	}
-	mux := http.NewServeMux()     // новый роутер
-	mux.HandleFunc("/", app.home) // регистрирует функцию home как обработчик для роутера mux ...
-	mux.HandleFunc("/snippet", app.showSnippet)
-	mux.HandleFunc("/snippet/create", app.createSnippet)
-
-	// инициализация FileServer, который будет обрабатывать HTTP-запросы к статическим файлам из ./ui/static/
-	fileServer := http.FileServer(neuterdFileSystem{http.Dir("./static")})
-	// регистрация всех запросов начинающихся со "/static"
-	mux.Handle("/static", http.NotFoundHandler())
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 
 	srv := &http.Server{
 		Addr:     *addr,
 		ErrorLog: errorlog,
-		Handler:  mux,
+		Handler:  app.routes(), // создает маршрутизатор и тп для декомпозиции
 	}
 	infolog.Printf("Запуск веб-сервера на http://%s", *addr)
 	err := srv.ListenAndServe() // Запуск нового веб-сервера

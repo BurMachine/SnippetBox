@@ -13,7 +13,7 @@ import (
 	*http.Request - это указател на структуру, которая содержит информацию о текущем запросе(GET, POST, DELETE, etc...)
 	w - writer куда это все пишется, r - хранит все реквесты(запросы)
 */
-func (app *application) home(w http.ResponseWriter, r *http.Request) { // "/"
+func (app *application1) home(w http.ResponseWriter, r *http.Request) { // "/"
 	if r.URL.Path != "/" { // Обработка неправильного URL
 		app.notFound(w)
 		return
@@ -37,7 +37,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) { // "/"
 }
 
 // Отображает определенную заметку
-func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) { // "/snippet"
+func (app *application1) showSnippet(w http.ResponseWriter, r *http.Request) { // "/snippet"
 	id, err := strconv.Atoi(r.URL.Query().Get("id")) // Считывание значения id. Затем проверка
 	if err != nil || id < 0 {
 		app.notFound(w)
@@ -47,7 +47,7 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) { //
 }
 
 // Создает новую заметку
-func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) { // "/snippet/create"
+func (app *application1) createSnippet(w http.ResponseWriter, r *http.Request) { // "/snippet/create"
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allowed-method", http.MethodPost) // добавляет ключ:значение в карту HTTP
 		app.clientError(w, http.StatusMethodNotAllowed)   // отправляет в ResponceWriter строку и в карту HTTP еод ошибки (перед write обязательно)
