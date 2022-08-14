@@ -2,6 +2,7 @@ package postsql
 
 import (
 	"database/sql"
+	"fmt"
 	"golangify.com/SnippetBox/pkg/models"
 )
 
@@ -17,8 +18,20 @@ func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
 	// вместо обычных двойных кавычек).
 	stmt := `INSERT INTO snippets (title, content, created, expires)
     VALUES(?, ?, current_timestamp, current_timestamp + interval '1 year'))`
+	_, err := m.DB.Exec(stmt, title, content, expires) // много вопросов
+	if err != nil {
+		return 0, err
+	}
+	// Используем метод LastInsertId(), чтобы получить последний ID
+	// созданной записи из таблицу snippets.
+	var id int
+	err = m.DB.QueryRow("INSERT INTO snippets (title) VALUES ('John') RETURNING id").Scan(&id)
+	if err != nil {
+		return 0, err
 
-	return 0, nil
+	}
+	fmt.Println(id)
+	return int(id), err // id - int64
 }
 
 // Get - Метод для возвращения данных заметки по её идентификатору ID.

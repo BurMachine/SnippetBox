@@ -53,5 +53,18 @@ func (app *application1) createSnippet(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusMethodNotAllowed)   // отправляет в ResponceWriter строку и в карту HTTP еод ошибки (перед write обязательно)
 		return
 	}
-	w.Write([]byte("Форма для создания новой заметки..."))
+
+	// Создаем несколько переменных, содержащих тестовые данные. Мы удалим их позже.
+	title := "История про улитку"
+	content := "Улитка выползла из раковины,\nвытянула рожки,\nи опять подобрала их."
+	expires := "7"
+
+	id, err := app.snippets.Insert(title, content, expires)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/snippet?id=%d", id), http.StatusSeeOther)
+	//w.Write([]byte("Форма для создания новой заметки..."))
 }
