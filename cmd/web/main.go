@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	_ "github.com/lib/pq"
+	"golangify.com/SnippetBox/pkg/models/postgresql"
 	"log"
 	"net/http"
 	"os"
@@ -13,6 +14,7 @@ import (
 type application1 struct {
 	errorlog *log.Logger
 	infolog  *log.Logger
+	snippets *postsql.SnippetModel
 }
 
 /*
@@ -40,6 +42,7 @@ func main() {
 	app := &application1{ // инициализация новой структуры, чтобы подтянуть методы
 		errorlog: errorlog,
 		infolog:  infolog,
+		snippets: &postsql.SnippetModel{DB: db},
 	}
 
 	srv := &http.Server{
