@@ -12,6 +12,12 @@ type SnippetModel struct {
 
 // Insert - Метод для создания новой заметки в базе дынных.
 func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
+	// Ниже будет SQL запрос, который мы хотим выполнить. Мы разделили его на две строки
+	// для удобства чтения (поэтому он окружен обратными кавычками
+	// вместо обычных двойных кавычек).
+	stmt := `INSERT INTO snippets (title, content, created, expires)
+    VALUES(?, ?, current_timestamp, current_timestamp + interval '1 year'))`
+
 	return 0, nil
 }
 

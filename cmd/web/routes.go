@@ -16,12 +16,3 @@ func (app *application1) routes() *http.ServeMux {
 	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 	return mux
 }
-
-//CREATE TABLE snippets
-//(
-//	id SERIAL PRIMARY KEY,
-//	title CHARACTER VARYING(100) NOT NULL,
-//	content_ TEXT NOT NULL,
-//	created TIMESTAMP NOT NULL,
-//	expires TIMESTAMP NOT NULL
-//);
