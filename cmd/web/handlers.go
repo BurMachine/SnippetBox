@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"golangify.com/SnippetBox/pkg/models"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -43,7 +45,16 @@ func (app *application1) showSnippet(w http.ResponseWriter, r *http.Request) { /
 		app.notFound(w)
 		return
 	}
-	fmt.Fprintf(w, "Отображение заметки с ID %d...", id)
+	s, err := app.snippets.Get(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	fmt.Fprintf(w, "%v", s)
 }
 
 // Создает новую заметку

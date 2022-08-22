@@ -2,6 +2,7 @@ package postsql
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"golangify.com/SnippetBox/pkg/models"
 )
@@ -13,14 +14,6 @@ type SnippetModel struct {
 
 // Insert - Метод для создания новой заметки в базе дынных.
 func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
-	// Ниже будет SQL запрос, который мы хотим выполнить. Мы разделили его на две строки
-	// для удобства чтения (поэтому он окружен обратными кавычками
-	// вместо обычных двойных кавычек).
-	//str := []rune(expires) + 'year'
-	//str = append(str, 'year')
-
-	//stmt := fmt.Sprintf("INSERT INTO snippets (title, content_, created, expires)VALUES(%s, %s,  current_timestamp, current_timestamp + interval '%s years", title, content, expires)
-
 	//stmt := `INSERT INTO snippets (title, content_, created, expires)
 	//VALUES($1, $2, current_timestamp, current_timestamp + $3::interval)`
 	stmt := `INSERT INTO snippets (title, content_, created, expires)
@@ -29,10 +22,8 @@ func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	// Используем метод LastInsertId(), чтобы получить последний ID
-	// созданной записи из таблицу snippets.
-	var id int
-	err = m.DB.QueryRow("INSERT INTO snippets (title) VALUES ('John') RETURNING id").Scan(&id)
+
+	id, err := lastEventIdSnippets(m.DB)
 	if err != nil {
 		return 0, err
 	}
@@ -42,10 +33,41 @@ func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
 
 // Get - Метод для возвращения данных заметки по её идентификатору ID.
 func (m *SnippetModel) Get(id int) (*models.Snippet, error) {
-	return nil, nil
+	stmt := `SELECT * FROM snippets
+    WHERE expires > current_timestamp AND id = $1;`
+	// Получение строчки
+	row := m.DB.QueryRow(stmt, id)
+	// Инициализируем указатель на новую структуру Snippet.
+	s := &models.Snippet{}
+	// Заполнение структуры для вывода
+	err := row.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, models.ErrNoRecord
+		} else {
+			return nil, err
+		}
+	}
+	// Если все хорошо, возвращается объект Snippet.
+	return s, nil
 }
 
 // Latest - Метод возвращает 10 наиболее часто используемые заметки.
 func (m *SnippetModel) Latest() ([]*models.Snippet, error) {
+
 	return nil, nil
+}
+
+/*
+	support functioln
+	return - last insert id from snippets table
+*/
+func lastEventIdSnippets(db *sql.DB) (int, error) {
+	var count int
+	row := db.QueryRow("SELECT MAX(id) FROM snippets;")
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }
