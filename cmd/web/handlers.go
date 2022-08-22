@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"golangify.com/SnippetBox/pkg/models"
-	"html/template"
 	"net/http"
 	"strconv"
 )
@@ -25,25 +24,9 @@ func (app *application1) home(w http.ResponseWriter, r *http.Request) { // "/"
 		app.serverError(w, err)
 		return
 	}
-	// Создаем экземпляр структуры templateData,
-	// содержащий срез с заметками.
-	data := &templateData{Snippets: s}
-	files := []string{
-		"../../ui/html/home.page.tmpl",
-		"../../ui/html/base.layout.tmpl",
-		"../../ui/html/footer.partial.tmpl",
-	}
-	pageTemp, err := template.ParseFiles(files...) // любой путь. Тут читается файл шаблона
-	if err != nil {
-		app.errorlog.Println(err.Error())
-		app.serverError(w, err)
-		return
-	}
-	err = pageTemp.Execute(w, data) // Записываем содержимое шаблона в тело HTTP ответа, nil для отправки динамических данных в шаблон
-	if err != nil {
-		app.errorlog.Println(err.Error())
-		app.serverError(w, err)
-	}
+	app.render(w, r, "home.page.tmpl", &templateData{
+		Snippets: s,
+	})
 }
 
 // Отображает определенную заметку
@@ -62,23 +45,10 @@ func (app *application1) showSnippet(w http.ResponseWriter, r *http.Request) { /
 		}
 		return
 	}
-	// Создаем экземпляр структуры templateData, содержащей данные заметки.
-	data := &templateData{Snippet: s}
-	files := []string{
-		"../../ui/html/show.page.tmpl",
-		"../../ui/html/base.layout.tmpl",
-		"../../ui/html/footer.partial.tmpl",
-	}
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	// Передаем структуру templateData в качестве данных для шаблона.
-	err = ts.Execute(w, data)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	// Используем помощника render() для отображения шаблона.
+	app.render(w, r, "show.page.tmpl", &templateData{
+		Snippet: s,
+	})
 }
 
 // Создает новую заметку

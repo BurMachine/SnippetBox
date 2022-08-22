@@ -26,3 +26,17 @@ func (app *application1) clientError(w http.ResponseWriter, status int) {
 func (app *application1) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
 }
+
+func (app *application1) render(w http.ResponseWriter, r *http.Request, name string, td *templateData) {
+	// Извлекаем соответствующий набор шаблонов из кэша в зависимости от названия страницы
+	ts, ok := app.templateCache[name]
+	if !ok {
+		app.serverError(w, fmt.Errorf("Шаблон %s не существует!", name))
+		return
+	}
+	// Рендерим файлы шаблона, передавая динамические данные из переменной `td`.
+	err := ts.Execute(w, td)
+	if err != nil {
+		app.serverError(w, err)
+	}
+}

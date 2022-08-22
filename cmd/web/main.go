@@ -47,9 +47,10 @@ func main() {
 	}
 
 	app := &application1{ // инициализация новой структуры, чтобы подтянуть методы
-		errorlog: errorlog,
-		infolog:  infolog,
-		snippets: &postsql.SnippetModel{DB: db},
+		errorlog:      errorlog,
+		infolog:       infolog,
+		snippets:      &postsql.SnippetModel{DB: db},
+		templateCache: templateCache,
 	}
 
 	srv := &http.Server{
