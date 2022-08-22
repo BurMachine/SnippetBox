@@ -12,7 +12,7 @@ func (app *application1) routes() *http.ServeMux {
 	//fileServer := http.FileServer(neuterdFileSystem{http.Dir("./static")})
 	// регистрация всех запросов начинающихся со "/static"
 	//mux.Handle("/static", http.NotFoundHandler())
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
+	fileServer := http.FileServer(http.Dir("../../ui/static/"))
 	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 	return mux
 }

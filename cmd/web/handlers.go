@@ -20,6 +20,14 @@ func (app *application1) home(w http.ResponseWriter, r *http.Request) { // "/"
 		app.notFound(w)
 		return
 	}
+	s, err := app.snippets.Latest()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	// Создаем экземпляр структуры templateData,
+	// содержащий срез с заметками.
+	data := &templateData{Snippets: s}
 	files := []string{
 		"../../ui/html/home.page.tmpl",
 		"../../ui/html/base.layout.tmpl",
@@ -31,7 +39,7 @@ func (app *application1) home(w http.ResponseWriter, r *http.Request) { // "/"
 		app.serverError(w, err)
 		return
 	}
-	err = pageTemp.Execute(w, nil) // Записываем содержимое шаблона в тело HTTP ответа, nil для отправки динамических данных в шаблон
+	err = pageTemp.Execute(w, data) // Записываем содержимое шаблона в тело HTTP ответа, nil для отправки динамических данных в шаблон
 	if err != nil {
 		app.errorlog.Println(err.Error())
 		app.serverError(w, err)
@@ -40,8 +48,8 @@ func (app *application1) home(w http.ResponseWriter, r *http.Request) { // "/"
 
 // Отображает определенную заметку
 func (app *application1) showSnippet(w http.ResponseWriter, r *http.Request) { // "/snippet"
-	id, err := strconv.Atoi(r.URL.Query().Get("id")) // Считывание значения id. Затем проверка
-	if err != nil || id < 0 {
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil || id < 1 {
 		app.notFound(w)
 		return
 	}
@@ -54,7 +62,23 @@ func (app *application1) showSnippet(w http.ResponseWriter, r *http.Request) { /
 		}
 		return
 	}
-	fmt.Fprintf(w, "%v", s)
+	// Создаем экземпляр структуры templateData, содержащей данные заметки.
+	data := &templateData{Snippet: s}
+	files := []string{
+		"../../ui/html/show.page.tmpl",
+		"../../ui/html/base.layout.tmpl",
+		"../../ui/html/footer.partial.tmpl",
+	}
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	// Передаем структуру templateData в качестве данных для шаблона.
+	err = ts.Execute(w, data)
+	if err != nil {
+		app.serverError(w, err)
+	}
 }
 
 // Создает новую заметку
