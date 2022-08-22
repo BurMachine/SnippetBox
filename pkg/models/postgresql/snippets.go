@@ -35,7 +35,6 @@ func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
 	err = m.DB.QueryRow("INSERT INTO snippets (title) VALUES ('John') RETURNING id").Scan(&id)
 	if err != nil {
 		return 0, err
-
 	}
 	fmt.Println(id)
 	return int(id), err // id - int64

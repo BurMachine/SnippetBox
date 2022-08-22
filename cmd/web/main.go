@@ -27,7 +27,7 @@ func main() {
 	addr := flag.String("addr", "127.0.0.1:4000", "Сетевоой адресс HTTP") // флаг командной строки
 
 	// очень жестко(pg_hba.conf + нужно правильно прописать адрес
-	dsn := flag.String("dsn", "postgresql://burmachine:123@127.0.0.1:5433/userdb?sslmode=disable", "Название postSQL источника данных")
+	dsn := flag.String("dsn", "postgresql://web:123@127.0.0.1:5433/userdb?sslmode=disable", "Название postSQL источника данных")
 
 	flag.Parse()                                                                  // извлечение флага из командной строки(меняет по адресу addr)
 	infolog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)                  // создание логгера INFO в stdout
