@@ -55,7 +55,31 @@ func (m *SnippetModel) Get(id int) (*models.Snippet, error) {
 // Latest - Метод возвращает 10 наиболее часто используемые заметки.
 func (m *SnippetModel) Latest() ([]*models.Snippet, error) {
 
-	return nil, nil
+	stmt := `SELECT * FROM snippets
+    WHERE expires > current_timestamp ORDER BY created DESC LIMIT 10;`
+	rows, err := m.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var snippets []*models.Snippet // слайс структур
+
+	for rows.Next() {
+		// Создаем новый экземпляр структуры и заполняем ее из строки таблицы
+		s := &models.Snippet{}
+		err := rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+		if err != nil {
+			return nil, err
+		}
+		// Добавляем структуру в слайс структур
+		snippets = append(snippets, s)
+	}
+	// вызываем метод Err() чтоб узнать не прозло ли ошибки пока работал цикл
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return snippets, nil
 }
 
 /*
