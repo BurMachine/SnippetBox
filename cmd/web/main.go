@@ -5,6 +5,7 @@ import (
 	"flag"
 	_ "github.com/lib/pq"
 	"golangify.com/SnippetBox/pkg/models/postgresql"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -12,9 +13,10 @@ import (
 )
 
 type application1 struct {
-	errorlog *log.Logger
-	infolog  *log.Logger
-	snippets *postsql.SnippetModel
+	errorlog      *log.Logger
+	infolog       *log.Logger
+	snippets      *postsql.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 /*
@@ -38,6 +40,11 @@ func main() {
 		errorlog.Fatal(err)
 	}
 	defer db.Close()
+
+	templateCache, err := newTemplateCache("../../ui/html/")
+	if err != nil {
+		errorlog.Fatal(err)
+	}
 
 	app := &application1{ // инициализация новой структуры, чтобы подтянуть методы
 		errorlog: errorlog,
