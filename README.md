@@ -1,5 +1,5 @@
 ## SnippetBox
-###Web application for storing notes. Implementation on GO and PostgreSQL database
+### Web application for storing notes. Implementation on GO and PostgreSQL database
 ![screenshots](screenshots/Screen%20Shot%202022-08-22%20at%2018.49.22.png)
 ![screenshots](screenshots/Screen%20Shot%202022-08-22%20at%2018.49.34.png)
 ![screenshots](screenshots/Screen%20Shot%202022-08-22%20at%2018.49.40.png)
